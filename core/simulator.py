@@ -38,8 +38,11 @@ def run_episode(env, policy, horizon):
     # Main simulation loop.
     for _ in range(horizon):
         
+        # get current price history and pass it to the strategy
+        price_history = env.get_price_history()
+
         # Step 1: ask the policy which action it wants to take.
-        action = policy.select_action()
+        action = policy.select_action(price_history)
         
         # Step 2: send that action to the environment.
         # The environment returns:

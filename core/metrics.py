@@ -8,12 +8,18 @@ def average_reward(rewards):
     # Compute the mean reward per step.
     return float(np.mean(rewards))
 
-
 def cumulative_reward(rewards):
     # Compute the cumulative (running total) reward over time.
     return np.cumsum(rewards)
 
-
 def num_steps(rewards):
     # Return the number of time steps in the episode.
     return len(rewards)
+
+def reward_by_regime(rewards, regimes):
+    rewards = np.array(rewards)
+    regimes = np.array(regimes)
+    return {
+        int(r): float(np.sum(rewards[regimes == r]))
+        for r in np.unique(regimes)
+    }
