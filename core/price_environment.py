@@ -37,13 +37,14 @@ class PriceEnvironment:
         Random seed for reproducibility.
     """
 
-    def __init__(self, regime_lengths, seed=None):
+    def __init__(self, regime_lengths, regime_sequence=None, seed=None):
         self.regime_lengths = regime_lengths
         self.seed = seed
 
         # generate full price series and regime labels upfront
         self.prices, self.regime_labels = generate_regime_price_series(
             regime_lengths=regime_lengths,
+            regime_sequence=regime_sequence,
             seed=seed
         )
 

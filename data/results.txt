@@ -1,0 +1,65 @@
+Single-Seed Results (seed=42)
+----------------------------------------
+AlwaysLong      | Total Reward: 46.5160 | Average Reward: 0.023258
+AlwaysShort     | Total Reward: -46.5160 | Average Reward: -0.023258
+AlwaysNeutral   | Total Reward: 0.0000 | Average Reward: 0.000000
+MA_Crossover    | Total Reward: 59.7433 | Average Reward: 0.029872
+Momentum        | Total Reward: 53.0742 | Average Reward: 0.026537
+MeanReversion   | Total Reward: 38.0534 | Average Reward: 0.019027
+VolatilityScaled | Total Reward: 18.2210 | Average Reward: 0.009110
+
+Multi-Seed Results (30 seeds, fixed order)
+--------------------------------------------------
+AlwaysLong      | Mean Total Reward:   150.41 | Std: 353.16
+AlwaysShort     | Mean Total Reward:  -150.41 | Std: 353.16
+AlwaysNeutral   | Mean Total Reward:     0.00 | Std: 0.00
+MA_Crossover    | Mean Total Reward:     8.59 | Std: 429.37
+Momentum        | Mean Total Reward:   -94.31 | Std: 291.38
+MeanReversion   | Mean Total Reward:   -39.16 | Std: 418.72
+VolatilityScaled | Mean Total Reward:     2.56 | Std: 29.07
+
+Random Regime Order Results (30 seeds, fixed lengths)
+--------------------------------------------------
+AlwaysLong      | Mean Total Reward:    32.87 | Std: 34.79
+AlwaysShort     | Mean Total Reward:   -32.87 | Std: 34.79
+AlwaysNeutral   | Mean Total Reward:     0.00 | Std: 0.00
+MA_Crossover    | Mean Total Reward:    -5.54 | Std: 64.05
+Momentum        | Mean Total Reward:   -22.91 | Std: 77.84
+MeanReversion   | Mean Total Reward:    19.35 | Std: 50.81
+VolatilityScaled | Mean Total Reward:     4.42 | Std: 31.14
+
+Random Regime Order + Length Results (30 seeds)
+--------------------------------------------------
+AlwaysLong      | Mean Total Reward:    33.23 | Std: 38.70
+AlwaysShort     | Mean Total Reward:   -33.23 | Std: 38.70
+AlwaysNeutral   | Mean Total Reward:     0.00 | Std: 0.00
+MA_Crossover    | Mean Total Reward:    -8.94 | Std: 64.34
+Momentum        | Mean Total Reward:   -26.01 | Std: 79.67
+MeanReversion   | Mean Total Reward:    22.12 | Std: 53.98
+VolatilityScaled | Mean Total Reward:     3.86 | Std: 31.33
+
+Lag Analysis — Random Order (30 seeds)
+------------------------------------------------------------
+MA_Crossover
+  Trending Up        | mean lag:    9.5 steps | never recovered: 0/30
+  Trending Down      | mean lag:    6.5 steps | never recovered: 0/30
+Momentum
+  Trending Up        | mean lag:    9.7 steps | never recovered: 0/30
+  Trending Down      | mean lag:    5.0 steps | never recovered: 0/30
+MeanReversion
+  Mean-Reverting     | mean lag:    2.0 steps | never recovered: 0/30
+VolatilityScaled
+  High Volatility    | mean lag:   80.8 steps | never recovered: 25/30
+
+Lag Analysis — Random Order + Length (30 seeds)
+------------------------------------------------------------
+MA_Crossover
+  Trending Up        | mean lag:    9.9 steps | never recovered: 0/30
+  Trending Down      | mean lag:    7.5 steps | never recovered: 0/30
+Momentum
+  Trending Up        | mean lag:   10.2 steps | never recovered: 0/30
+  Trending Down      | mean lag:    5.9 steps | never recovered: 0/30
+MeanReversion
+  Mean-Reverting     | mean lag:    2.9 steps | never recovered: 0/30
+VolatilityScaled
+  High Volatility    | mean lag:  130.8 steps | never recovered: 24/30

@@ -12,6 +12,8 @@ class AlwaysLong:
         return 0  # Long
 
     def update(self, action, reward):
+        # Fixed strategies ignore feedback. update() is called by the simulator
+        # uniformly so adaptive strategies can learn here in the future.
         pass
 
 
@@ -39,6 +41,8 @@ class AlwaysNeutral:
 
     def update(self, action, reward):
         pass
+
+#DISCRETIONARY STRATEGIES 
 
 
 class MovingAverageCrossover:
@@ -79,8 +83,6 @@ class MovingAverageCrossover:
     def update(self, action, reward):
         pass
 
-
-#DISCRETIONARY STRATEGIES 
 
 class MomentumStrategy:
     """

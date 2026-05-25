@@ -40,6 +40,26 @@ def generate_trending(num_steps, start_price=100.0, drift=0.001, volatility=0.01
 
     return prices
 
+def generate_trending_down(num_steps, start_price=100.0, drift=-0.001, volatility=0.01, seed=None):
+    """
+    Generate a downward trending price series using Geometric Brownian Motion.
+
+    Identical to generate_trending but with negative drift,
+    so price has a persistent downward tendency.
+
+    """
+    if seed is not None:
+        np.random.seed(seed)
+
+    prices = np.zeros(num_steps + 1)
+    prices[0] = start_price
+
+    for t in range(1, num_steps + 1):
+        shock = np.random.normal(0, 1)
+        prices[t] = prices[t-1] * np.exp(drift + volatility * shock)
+
+    return prices
+
 
 def generate_mean_reverting(num_steps, start_price=100.0, mean_level=100.0, speed=0.05, volatility=0.8, seed=None):
     """
@@ -84,8 +104,31 @@ def generate_mean_reverting(num_steps, start_price=100.0, mean_level=100.0, spee
     return prices
 
 
-def generate_high_volatility(num_steps, start_price=100.0, 
+def generate_high_volatility(num_steps, start_price=100.0,
                               volatility=3.0, seed=None):
+    """
+    Generate a high-volatility price series with zero net drift.
+
+    Uses an additive model (not GBM) so large shocks don't compound
+    exponentially. Shocks are demeaned before use so the series has
+    exactly zero expected drift regardless of seed.
+
+    Parameters
+    ----------
+    num_steps : int
+        Number of price steps to generate.
+    start_price : float
+        Starting price.
+    volatility : float
+        Standard deviation of the additive shock per step.
+    seed : int or None
+        Random seed for reproducibility.
+
+    Returns
+    -------
+    np.ndarray
+        Array of prices of length num_steps + 1.
+    """
     if seed is not None:
         np.random.seed(seed)
 
@@ -103,76 +146,89 @@ def generate_high_volatility(num_steps, start_price=100.0,
     return prices
 
 
-def generate_regime_price_series(regime_lengths, volatilities=None, seed=None):
+def generate_regime_price_series(regime_lengths, regime_sequence=None, seed=None):
     """
-    Generate a full price series that switches between regimes.
-
-    Stitches together trending, mean-reverting, and high-volatility
-    segments into one continuous price series.
+    Generate a full price series switching across four regimes:
+        0 - Trending up
+        1 - Trending down
+        2 - Mean-reverting
+        3 - High volatility
 
     Parameters
     ----------
     regime_lengths : list[int]
-        Number of steps for each regime in order.
-        Example: [200, 200, 200] means 200 steps each of trending,
-        mean-reverting, and high volatility.
+        Number of steps for each segment. Length must match regime_sequence.
+    regime_sequence : list[int] or None
+        Order of regime types to run. Defaults to [0, 1, 2, 3].
+        Example: [2, 0, 3, 1] runs mean-reverting first, then trending up, etc.
+    seed : int or None
 
     Returns
     -------
     prices : np.ndarray
-        Full price series across all regimes.
+        Full price series of length sum(regime_lengths) + 1.
     regimes : np.ndarray
-        Regime label at each step (0, 1, or 2).
+        Regime label for each price index (same length as prices).
+        Labels match regime_sequence values (0–3), not position order.
     """
+    if regime_sequence is None:
+        regime_sequence = list(range(len(regime_lengths)))
+
     if seed is not None:
         np.random.seed(seed)
 
     all_prices = []
     all_regimes = []
 
-    # start price carries over between regimes for continuity
     current_price = 100.0
 
     generators = [
-        lambda n, p: generate_trending(n, start_price=p, drift=0.003, volatility=0.01),
+        lambda n, p: generate_trending(n, start_price=p, drift=0.001, volatility=0.01),
+        lambda n, p: generate_trending_down(n, start_price=p, drift=-0.001, volatility=0.01),
         lambda n, p: generate_mean_reverting(n, start_price=p, mean_level=p, speed=0.05, volatility=0.8),
         lambda n, p: generate_high_volatility(n, start_price=p, volatility=3.0),
-        ]
+    ]
 
-    for regime_idx, length in enumerate(regime_lengths):
-        prices = generators[regime_idx](length, current_price)
-        # exclude first price to avoid duplicating the join point
-        # except for the very first segment
+    for regime_type, length in zip(regime_sequence, regime_lengths):
+        prices = generators[regime_type](length, current_price)
         if len(all_prices) == 0:
             all_prices.extend(prices)
-            all_regimes.extend([regime_idx] * len(prices))
+            all_regimes.extend([regime_type] * len(prices))
         else:
             all_prices.extend(prices[1:])
-            all_regimes.extend([regime_idx] * (len(prices) - 1))
+            all_regimes.extend([regime_type] * (len(prices) - 1))
 
         current_price = prices[-1]
 
     return np.array(all_prices), np.array(all_regimes)
 
-
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
 
     prices, regimes = generate_regime_price_series(
-        regime_lengths=[200, 200, 200],
+        regime_lengths=[500, 500, 500, 500],
         seed=42
     )
 
+    colors = {
+        0: "lightyellow",
+        1: "lightgreen",
+        2: "lightblue",
+        3: "lightcoral"
+    }
+    names = {
+        0: "Trending Up",
+        1: "Trending Down",
+        2: "Mean-Reverting",
+        3: "High Volatility"
+    }
+
     fig, ax = plt.subplots(figsize=(14, 5))
 
-    colors = {0: "lightyellow", 1: "lightblue", 2: "lightcoral"}
-    names = {0: "Trending", 1: "Mean-Reverting", 2: "High Volatility"}
-
-    # shade regimes
     start = 0
     for i in range(1, len(regimes) + 1):
         if i == len(regimes) or regimes[i] != regimes[start]:
-            ax.axvspan(start, i, alpha=0.3, color=colors[regimes[start]], 
+            ax.axvspan(start, i, alpha=0.3, color=colors[regimes[start]],
                       label=names[regimes[start]])
             start = i
 
